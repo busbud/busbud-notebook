@@ -1,0 +1,11 @@
+notebook:
+  container_name: busbud-notebook
+  image: busbud-notebook
+  tty: true
+  ports:
+    - 8888:8888
+  volumes:
+    - ${NOTEBOOKS_DIR}:/notebooks
+    - ${HOST_PACKAGES_DIR}:/host-packages
+  env_file:
+    - local.env
