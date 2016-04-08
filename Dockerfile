@@ -1,9 +1,15 @@
 FROM alpine:3.3
 
+VOLUME ["/host-packages", "/notebooks"]
+
+EXPOSE 8888
+WORKDIR /notebooks
+ENTRYPOINT ["tini", "--"]
+CMD ["jupyter", "notebook"]
+
 RUN echo "@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
     && echo "@contrib http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
     && mkdir /root/.jupyter \
-    && mkdir /host-packages \
     && mkdir -p /root/.local/lib/python2.7 \
     && ln -s /host-packages /root/.local/lib/python2.7/site-packages
 
@@ -41,9 +47,3 @@ RUN apk add --update --no-cache \
       freetype-dev \
       libpng-dev \
     && rm -r /root/.cache/pip
-
-EXPOSE 8888
-VOLUME ["/host-packages", "/notebooks"]
-WORKDIR /notebooks
-ENTRYPOINT ["tini", "--"]
-CMD ["jupyter", "notebook"]
