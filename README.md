@@ -39,3 +39,13 @@ docker run -p 8888:8888 -v `pwd`/lib/python2.7/site-packages:/host-packages busb
 ```
 
 The container then symlinks its `/host-packages` to the appropriate place where Python looks for user packages.
+
+
+## Building
+
+Until we publish the image to the Hub, you have to build the image locally.
+From the directory containing this Dockerfile, run:
+
+```sh
+docker build -t busbud-notebook .
+```
