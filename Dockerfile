@@ -10,24 +10,32 @@ CMD ["jupyter", "notebook"]
 RUN echo "@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
     && echo "@contrib http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
     && mkdir /root/.jupyter \
+    && mkdir -p /root/.ipython/profile_bbnotebook \
     && mkdir -p /root/.local/lib/python2.7 \
     && ln -s /host-packages /root/.local/lib/python2.7/site-packages
 
-COPY jupyter_notebook_config.py /root/.jupyter/
+COPY jupyter_*.py /root/.jupyter/
+COPY ipython_*.py /root/.ipython/profile_bbnotebook/
 
-RUN apk add --update --no-cache \
+RUN apk --update --no-cache upgrade \
+    && apk add --no-cache \
+      ca-certificates \
+      openssl \
       tini@contrib \
       python \
-      python-dev \
       py-zmq@testing \
       py-numpy@testing \
-      py-numpy-dev@testing \
       py-scipy@testing \
-      alpine-sdk \
       freetype \
-      freetype-dev \
       libpng \
+      alpine-sdk \
+      python-dev \
+      py-numpy-dev@testing \
+      freetype-dev \
       libpng-dev \
+      postgresql-dev \
+      libffi-dev \
+    && update-ca-certificates \
     && python -m ensurepip \
     && rm -r /usr/lib/python*/ensurepip \
     && pip install --upgrade \
@@ -36,14 +44,17 @@ RUN apk add --update --no-cache \
     && pip install \
       jupyter \
       pandas \
-      python-nvd3 \
       scikit-learn \
       statsmodels \
       matplotlib \
+    && pip install --upgrade https://github.com/busbud/python-nvd3/tarball/jupyter \
+    && pip install --upgrade https://github.com/busbud/ipython-auto-connect/tarball/master \
     && apk del \
       alpine-sdk \
       py-numpy-dev \
       python-dev \
       freetype-dev \
       libpng-dev \
+    && pip uninstall -y setuptools \
+    && pip install setuptools \
     && rm -r /root/.cache/pip
