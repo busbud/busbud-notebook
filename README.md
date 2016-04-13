@@ -2,93 +2,82 @@
 
 A Docker image for running Jupyter notebooks with all the tools we use most often at Busbud.
 
-## Run using docker compose
+## Quickstart
 
-### Configure
+### Requirements
 
-This repository contains `docker-compose.template.yml` with some default options you might want.
-Copy this file to `docker-compose.yml` and customize it:
+* Install [VirtualBox](https://www.virtualbox.org/) and [Docker Toolbox](https://www.docker.com/products/docker-toolbox)
+* Create a Docker machine:
 
-```sh
-cp docker-compose.template.yml docker-compose.yml
-vim docker-compose.yml
-```
+  ```
+  docker-machine create -d virtualbox default
+  ```
+* Activate the machine. Every time you start a new shell (e.g. a new iTerm window or tab), you need to run
 
-In particular, it expects the following:
+  ```
+  eval "$(docker-machine env default)"
+  ```
 
-* the env var `NOTEBOOKS_DIR` containing the absolute path to where you want to serve
-  notebooks from on your host computer
-* the env var `HOST_PACKAGES_DIR` containing the absolute path to a Python `site-packages`
-  directory with packages you want to make available inside notebooks
+### Install busbud-notebook
 
-  > **Important!** If your host isn't a 64 bit Linux, only pure Python packages will work.
+This quickstart guide assumes you'll install under `~/busbud-notebook`.
+If that's not the case, simply replace all occurrences of this path with any path you prefer.
 
-* the file `local.env` in the current directory containing env vars you want to make available
-  to the code running inside notebooks. The format is `NAME=value`, one per line.
+* Clone this repository:
 
-You can customize this as you wish, removing or adding volumes, env vars or other env files.
-See [Docker compose file reference](https://docs.docker.com/compose/compose-file/) for available options.
+  ```
+  git clone git@github.com:busbud/busbud-notebook.git ~/busbud-notebook
+  ```
 
-### Run
+* Build the Docker image
 
-Once you have all the files (`local.env`) and env vars (`NOTEBOOKS_DIR`, `HOST_PACKAGES_DIR`) in place,
-you simply
+  > Eventually we will publish the image to Docker Hub and this will no longer be necessary.
+  > For the moment though, this step will take about 8 minutes.
+  
+  ```
+  cd ~/busbud-notebook
+  docker build -t busbud-notebook .
+  ```
 
-```sh
-docker-compose up
-```
+### Configure busbud-notebook
 
-When you're done, you can run either one of the two commands:
+* Copy the docker-compose config file:
 
-```sh
-docker-compose stop
-docker kill busbud-notebook
-```
+  ```
+  cp docker-compose.template.yml docker-compose.yml
+  ```
+  
+* Edit `docker-compose.yml` and configure it to your preferences.
 
-## Run using plain docker
+  > Alternatively, steal a colleague's `docker-compose.yml`.
+  
+  * Replace `${NOTEBOOKS_DIR}` with the path on your computer where you'll be keeping your notebooks.
+  * Remove the line with `${HOST_PACKAGES_DIR}`, it's an experimental feature that lets you inject pure-Python
+    packages into Jupyter without having to rebuild the Docker image.
+  * Replace the example credentials under the `environment` section with real ones.
 
-Basic usage:
+### Run busbud-notebook
 
-```sh
-docker run -p 8888:8888 busbud-notebook
-```
+* Start with
 
-### Notebooks
+  ```
+  docker-compose up -d && docker logs -f busbud-notebook
+  ```
+  
+* Stop with
 
-If you need to load notebooks from a folder on your computer, `<notebooks_dir>`,
-you can pass the absolute path as a volume:
+  ```
+  docker-compose stop && docker rm busbud-notebook
+  ```
+  
+### IPython auto connect
 
-```sh
-docker run -p 8888:8888 -v <notebooks_dir>:/notebooks busbud-notebook
-```
+The notebook loads the [ipython-auto-connect](https://github.com/busbud/ipython-auto-connect) into every Python kernel, so with the right environment variables set up in `docker-compose.yml`, you can have implicit access to [SQLAlchemy sessions](http://docs.sqlalchemy.org/en/latest/orm/session_api.html#sqlalchemy.orm.session.Session) and [BigQuery-Python clients](https://github.com/tylertreat/BigQuery-Python).
 
-A simpler way is to navigate to `<notebooks_dir>` and run this literally:
+* `<NAME>_DATABASE_URI` will inject the SQLAlchemy session `<name>_db`
 
-```sh
-docker run -p 8888:8888 -v `pwd`:/notebooks busbud-notebook
-```
+  E.g. adding `API_DATABASE_URI` will provide the variable `api_db` to your notebooks.
+  
+* `<NAME>_BQ_EMAIL` will inject the BigQuery client `<name>_bq`, using credentials from `<NAME>_BQ_PROJECT` and `<NAME>_BQ_KEY`, all of which you can obtain from a JSON-format key for a service account.
 
-### Python packages
-
-If you need additional packages that don't come with busbud-notebook, you can install them
-into a virtualenv and mount its site-packages folder as a volume:
-
-```sh
-cd <notebook_packages>
-virtualenv .
-. bin/activate
-pip install Example
-docker run -p 8888:8888 -v `pwd`/lib/python2.7/site-packages:/host-packages busbud-notebook
-```
-
-The container then symlinks its `/host-packages` to the appropriate place where Python looks for user packages.
-
-
-## Building
-
-Until we publish the image to the Hub, you have to build the image locally.
-From the directory containing this Dockerfile, run:
-
-```sh
-docker build -t busbud-notebook .
-```
+  E.g. adding `BIG_DATA_BQ_(EMAIL,KEY,PROJECT)` will provide the variable `big_data_bq` to your notebooks.
