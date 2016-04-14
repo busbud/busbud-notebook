@@ -72,12 +72,12 @@ If that's not the case, simply replace all occurrences of this path with any pat
   
 ### IPython auto connect
 
-The notebook loads the [ipython-auto-connect](https://github.com/busbud/ipython-auto-connect) into every Python kernel, so with the right environment variables set up in `docker-compose.yml`, you can have implicit access to [SQLAlchemy sessions](http://docs.sqlalchemy.org/en/latest/orm/session_api.html#sqlalchemy.orm.session.Session) and [BigQuery-Python clients](https://github.com/tylertreat/BigQuery-Python).
+The notebook loads the [ipython-auto-connect](https://github.com/busbud/ipython-auto-connect) package into every Python kernel, so with the right environment variables set up in `docker-compose.yml`, you can have implicit access to [SQLAlchemy sessions](http://docs.sqlalchemy.org/en/latest/orm/session_api.html#sqlalchemy.orm.session.Session) and [BigQuery-Python clients](https://github.com/tylertreat/BigQuery-Python).
 
 * `<NAME>_DATABASE_URI` will inject the SQLAlchemy session `<name>_db`
 
-  E.g. adding `API_DATABASE_URI` will provide the variable `api_db` to your notebooks.
+  > `API_DATABASE_URI` in your config will provide the variable `api_db` to your notebooks.
   
 * `<NAME>_BQ_EMAIL` will inject the BigQuery client `<name>_bq`, using credentials from `<NAME>_BQ_PROJECT` and `<NAME>_BQ_KEY`, all of which you can obtain from a JSON-format key for a service account.
 
-  E.g. adding `BIG_DATA_BQ_(EMAIL,KEY,PROJECT)` will provide the variable `big_data_bq` to your notebooks.
+  > `BIG_DATA_BQ_(EMAIL,KEY,PROJECT)` will provide the variable `big_data_bq` to your notebooks.
