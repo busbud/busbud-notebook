@@ -19,6 +19,8 @@ A Docker image for running Jupyter notebooks with all the tools we use most ofte
   eval "$(docker-machine env default)"
   ```
 
+  It's useful to either add this line to your `.bashrc` file, or to create an easy to type alias such as `D`.
+
 ### Install busbud-notebook
 
 This quickstart guide assumes you'll install under `~/busbud-notebook`.
