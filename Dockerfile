@@ -35,6 +35,10 @@ RUN apk --update --no-cache upgrade \
       libpng-dev \
       postgresql-dev \
       libffi-dev \
+      libxml2 \
+      libxml2-dev \
+      libxslt \
+      libxslt-dev \
     && update-ca-certificates \
     && python -m ensurepip \
     && rm -r /usr/lib/python*/ensurepip \
