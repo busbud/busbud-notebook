@@ -10,12 +10,12 @@ CMD ["jupyter", "notebook"]
 RUN echo "@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
     && echo "@contrib http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
     && mkdir /root/.jupyter \
-    && mkdir -p /root/.ipython/profile_bbnotebook \
+    && mkdir -p /root/.ipython/profile_default \
     && mkdir -p /root/.local/lib/python2.7 \
     && ln -s /host-packages /root/.local/lib/python2.7/site-packages
 
 COPY jupyter_*.py /root/.jupyter/
-COPY ipython_*.py /root/.ipython/profile_bbnotebook/
+COPY ipython_*.py /root/.ipython/profile_default/
 
 RUN apk --update --no-cache upgrade \
     && apk add --no-cache \
@@ -47,6 +47,11 @@ RUN apk --update --no-cache upgrade \
       scikit-learn \
       statsmodels \
       matplotlib \
+    && pip install \
+      arrow \
+      requests \
+      BeautifulSoup \
+      lxml \
     && pip install --upgrade https://github.com/busbud/python-nvd3/tarball/jupyter \
     && pip install --upgrade https://github.com/busbud/ipython-auto-connect/tarball/master \
     && apk del \
