@@ -54,7 +54,7 @@ RUN apk --update --no-cache upgrade \
     && pip install \
       arrow \
       requests \
-      BeautifulSoup \
+      beautifulsoup4 \
       lxml \
     && pip install --upgrade https://github.com/busbud/python-nvd3/tarball/jupyter \
     && pip install --upgrade https://github.com/busbud/ipython-auto-connect/tarball/master \
